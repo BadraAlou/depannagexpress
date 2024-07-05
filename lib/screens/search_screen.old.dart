@@ -207,7 +207,7 @@ class PredictionTile extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      //SizedBox(height: 8.0,),
+                      SizedBox(height: 8.0,),
                       Text(placePredictions.main_text!, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 16.0),),
                       SizedBox(height: 2.0,),
                       Text(placePredictions.secondary_text!, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12.0, color: Colors.grey),),

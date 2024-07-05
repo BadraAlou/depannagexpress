@@ -1,9 +1,6 @@
 import 'dart:async';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:depannagexpress/assistants/requestAssistant.dart';
-import 'package:depannagexpress/controllers/map_controller.dart';
-import 'package:depannagexpress/models/address.dart';
 import 'package:depannagexpress/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_geofire/flutter_geofire.dart';
@@ -11,7 +8,6 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 //import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:depannagexpress/widgets/Divider.dart';
 import 'package:depannagexpress/widgets/progressDialog.dart';
@@ -40,8 +36,6 @@ class MainMapScreen extends StatefulWidget {
 class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateMixin {
 
   // Users currentUser = Users();
-  MapController mapController = Get.put(MapController());
-
 
   Completer<GoogleMapController> _controllerGoogleMap = Completer();
   late GoogleMapController newGoogleMapController;
@@ -53,8 +47,6 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
   Set<Polyline> polylineSet = {};
 
   late Position currentPosition;
-  //late Position garagePosition;
-  final LatLng garagePosition = LatLng(12.6200175, -8.0035281);
   var geoLocator = Geolocator();
   double bottomPaddingOfMap = 0;
 
@@ -77,7 +69,7 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
   void initState() {
 
     getCurrentUserInfo();
-    //locatePosition();
+    locatePosition();
     // getNewVersion();
     super.initState();
 
@@ -152,8 +144,6 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
       circlesSet.clear();
       pLineCoordinates.clear();
 
-      setGarageMarker();
-
     });
 
     locatePosition();
@@ -186,7 +176,6 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
     }
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     currentPosition = position;
-    print('*** Yo position: $position');
 
     LatLng latLatPosition = LatLng(position.latitude, position.longitude);
 
@@ -196,72 +185,13 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
     String address = await AssistantMethods.searchCoordinateAddress(position, context);
     print("This is your address :: " + address);
 
-    //String addressDropOff = await AssistantMethods.searchCoordinateAddressDropOff(LatLng(12.6200175, -8.0035281), context);
-    String addressDropOff = await AssistantMethods.searchCoordinateAddressDropOff(LatLng(garagePosition.latitude, garagePosition.longitude), context);
-    print("This is your destination address ==> " + addressDropOff);
-
-    if(mapController.typeRemorquage.value == 1) {
-      print('remorquage simple');
-
-    } else if(mapController.typeRemorquage.value == 2) {
-      displayRideDetailsContainer();
-    } else {
-      print('reparation sur place');
-      displayRideDetailsContainer();
-    }
-
-
-    //displayRequestRideContainer();
-
-    // LatLng initialPosition = LatLng(position.latitude, position.longitude);
-    // LatLng finalPosition = LatLng(12.6200175, -8.0035281);
-    // var directionDetails = AssistantMethods.obtainPlaceDirectionDetails(initialPosition, finalPosition);
-    // print('******** Oh bro le resultat attendu: ${directionDetails}');
-
-
-    // pLineCoordinates.add(LatLng(position.latitude, position.longitude));
-    // pLineCoordinates.add(LatLng(12.6200175, -8.0035281));
-    //
-    // polylineSet.clear();
-    //
-    // setState(() {
-    //   Polyline polyline = Polyline(
-    //     color: Colors.pink,
-    //     polylineId: PolylineId("PolylineID"),
-    //     jointType: JointType.round,
-    //     points: pLineCoordinates,
-    //     width: 5,
-    //     startCap: Cap.roundCap,
-    //     endCap: Cap.roundCap,
-    //     geodesic: true,
-    //   );
-    //
-    //   polylineSet.add(polyline);
-    //
-    // });
-
     initGeoFireLister();
   }
 
-  setGarageMarker() {
-    markersSet.add(Marker(
-      icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-      markerId: MarkerId('marker1'),
-      //position: LatLng(12.6027806, -7.9936909), // Daoudabougou
-      position: LatLng(12.6200175, -8.0035281), // BAdalagougou garage
-      infoWindow: InfoWindow(title: 'Garage Depannage X-Press - Badalabougou'),
-
-
-
-    ));
-  }
-
   static final CameraPosition garagePlace = CameraPosition(
-    target: LatLng(12.6200175, -8.0035281), //Badalagougou garage
+    target: LatLng(12.6200175, -8.0035281),
     zoom: 14.4746,
   );
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -376,7 +306,6 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
 
               setState(() {
                 bottomPaddingOfMap = 300.0;
-                setGarageMarker();
               });
 
               // Géolocaliser ma position
@@ -423,7 +352,6 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
             ),
           ),
 
-          // Postion(actual) part
           Positioned(
             left: 0.0,
             right: 0.0,
@@ -453,10 +381,8 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 6.0,),
-                      Text("Garage: ${mapController.distanceMyPositionToGarageText.value}", style: TextStyle(fontSize: 16.0),),
-                      //Text("Garage Value: ${(mapController.distanceMyPositionToGarage.value)/1000}", style: TextStyle(fontSize: 16.0),),
-                      //Text("Ou allez vous?", style: TextStyle(fontSize: 20.0, fontFamily: "Brand Bold"),),
-                      //Text("Choisir une destination", style: TextStyle(fontSize: 14.0),),
+                      Text("Bonjour,", style: TextStyle(fontSize: 10.0),),
+                      Text("Ou allez vous?", style: TextStyle(fontSize: 20.0, fontFamily: "Brand Bold"),),
                       SizedBox(height: 20.0),
 
                       GestureDetector(
@@ -486,7 +412,7 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
                               children: [
                                 Icon(Icons.search, color: Colors.blueAccent,),
                                 SizedBox(width: 10.0,),
-                                Text("Chercher une destination")
+                                Text("Rechercher")
                               ],
                             ),
                           ),
@@ -576,27 +502,17 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
                           child: Row(
                             children: [
                               //Image.asset("images/taxi.png", height: 70.0, width: 80.0,),
-                              Image.asset("assets/depanneuse.png", height: 50.0, width: 80.0,),
+                              Image.asset("assets/depanneuse.jpg", height: 70.0, width: 80.0,),
                               SizedBox(width: 16.0,),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    //"Trajet", style: TextStyle(fontSize: 18.0, fontFamily: "Brand-Bold",),
-                                    "Trajet: ${(mapController.distanceMyPositionToGarage.value + mapController.currentDistanceValue.value) / 1000} km", style: TextStyle(fontSize: 18.0),
+                                    "Moto", style: TextStyle(fontSize: 18.0, fontFamily: "Brand-Bold",),
                                   ),
                                   Text(
-                                    //((tripDirectionDetails != null) ? tripDirectionDetails.distanceText.toString() : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
-                                    ((tripDirectionDetails != null) ? 'Garage: ${mapController.distanceMyPositionToGarageText.value}' : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
+                                    ((tripDirectionDetails != null) ? tripDirectionDetails.distanceText.toString() : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
                                   ),
-                                  Text(
-                                    ((tripDirectionDetails != null) ? 'Destination: ${tripDirectionDetails.distanceText}' : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
-                                    //((tripDirectionDetails != null) ? 'Destination: ${(mapController.currentDistanceText.value ?? 0)} ==>' : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
-                                  ),
-                                  // Text(
-                                  //   //((tripDirectionDetails != null) ? tripDirectionDetails.distanceText.toString() : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
-                                  //   ((tripDirectionDetails != null) ? 'Total: ${((tripDirectionDetails.distanceValue ?? 0) + mapController.distanceMyPositionToGarage.value).toString()}' : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
-                                  // ),
                                 ],
                               ),
 
@@ -613,25 +529,24 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
 
                       SizedBox(height: 20.0,),
 
-                      // Padding(
-                      //   padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      //   child:
-                      //   Row(
-                      //     children: [
-                      //       Icon(FontAwesomeIcons.moneyCheck, size: 18.0, color: Colors.black54,),
-                      //       SizedBox(width: 16.0,),
-                      //       Text("Cash"),
-                      //       SizedBox(width: 6.0,),
-                      //       Icon(Icons.keyboard_arrow_down, color: Colors.black54, size: 16.0,),
-                      //     ],
-                      //   ),
-                      // ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          children: [
+                            Icon(FontAwesomeIcons.moneyCheckAlt, size: 18.0, color: Colors.black54,),
+                            SizedBox(width: 16.0,),
+                            Text("Cash"),
+                            SizedBox(width: 6.0,),
+                            Icon(Icons.keyboard_arrow_down, color: Colors.black54, size: 16.0,),
+
+                          ],
+                        ),
+                      ),
 
                       SizedBox(height: 20.0,),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: ElevatedButton(
-
                           // RaisedButton(
                           onPressed: () {
                             displayRequestRideContainer();
@@ -642,8 +557,8 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("Commander", style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.black),),
-                                Icon(FontAwesomeIcons.truck, color: Colors.black, size: 32.0,),
+                                Text("Commander", style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.white),),
+                                Icon(FontAwesomeIcons.biking, color: Colors.white, size: 18.0,),
                               ],
                             ),
                           ),
@@ -677,7 +592,7 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
               ),
               height: requestRideContainerHeight,
               child: Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding: const EdgeInsets.all(30.0),
                 child: Column(
                   children: [
                     SizedBox(height: 12.0,),
@@ -690,10 +605,10 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
                           text: [
                             "Commande en cours...",
                             "Patientez svp...",
-                            //"Recherche d'un conducteur...",
+                            "Recherche d'un conducteur...",
                           ],
                           textStyle: TextStyle(
-                              fontSize: 20.0,
+                              fontSize: 35.0,
                               fontFamily: "Signatra"
                           ),
                           colors: [
@@ -752,7 +667,6 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
     var initialPos = Provider.of<AppData>(context, listen: false).pickUpLocation;
     var finalPos = Provider.of<AppData>(context, listen: false).dropOffLocation;
 
-    //var finalPos = LatLng(12.6200175, -8.0035281);
     var pickUpLatLng = LatLng(initialPos!.latitude!, initialPos.longitude!);
     var dropOffLatLng = LatLng(finalPos!.latitude!, finalPos.longitude!);
 
@@ -766,22 +680,6 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
     // print(details);
     setState(() {
       tripDirectionDetails = details;
-
-      if(mapController.isLocate.value == false ) {
-        // Distance garage ma position pas defini
-        mapController.isLocate.value = true;
-        mapController.currentDistanceText.value = tripDirectionDetails.distanceText ?? '';
-        mapController.distanceMyPositionToGarageText.value = tripDirectionDetails.distanceText ?? '';
-        mapController.currentDistanceValue.value = tripDirectionDetails.distanceValue ?? 0;
-        mapController.distanceMyPositionToGarage.value = tripDirectionDetails.distanceValue ?? 0;
-
-      } else {
-        // Distance garage ma position deja defini
-        mapController.currentDistanceText.value = tripDirectionDetails.distanceText ?? '';
-        mapController.currentDistanceValue.value = tripDirectionDetails.distanceValue ?? 0;
-      }
-
-
     });
 
     Navigator.pop(context);
@@ -1008,57 +906,4 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
   //   });
   // }
 
-  void getPlaceAddressDetails(String placeId, context) async {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) => ProgressDialog(message: "Setting Dropoff, Please wait...",)
-    );
-
-    String placeDetailsUrl = "https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$mapKey";
-
-    var res = await RequestAssistant.getRequest(placeDetailsUrl);
-
-    Navigator.pop(context);
-
-    if(res == "failed") {
-      return;
-    }
-    if(res["status"] == "OK") {
-      Address address = Address();
-      address.placeName = res["result"]["name"];
-      address.placeId = placeId;
-      address.latitude = res["result"]["geometry"]["location"]["lat"];
-      address.longitude = res["result"]["geometry"]["location"]["lng"];
-
-      Provider.of<AppData>(context, listen: false).updateDropOffLocationAddress(address);
-      print("********************************** This is drop off Location :: ");
-      print(address.placeName);
-
-      Navigator.pop(context, "obtainDirection");
-
-    }
-  }
-
-  // void findPlace(String placeName) async {
-  //   if(placeName.length > 1) {
-  //     String autoCompleteUrl = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$placeName&key=$mapKey&sessiontoken=1234567890&components=country:ml";
-  //     var res = await RequestAssistant.getRequest(autoCompleteUrl);
-  //     print('****** Yo res cherche destination: $res');
-  //     if(res == "failed") {
-  //       return;
-  //     }
-  //
-  //     if(res["status"] == "OK") {
-  //       var predictions = res["predictions"];
-  //
-  //       var placesList = (predictions as List).map((e) => PlacePredictions.fromJson(e)).toList();
-  //       setState(() {
-  //         placePredictionList = placesList;
-  //       });
-  //     }
-  //   }
-  // }
-
 }
-
-

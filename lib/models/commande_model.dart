@@ -1,13 +1,17 @@
 
-class PackModel {
+class CommandeModel {
   int? id;
   String? nom;
-  String? description;
-  num? prix;
+  String? depart;
+  String? destination;
+  num? latitude;
+  num? longitude;
+  num? distanceValue;
+  String? distanceText;
   String? details;
 
-  PackModel({
-    this.id, this.nom, this.description, this.prix, this.details
+  CommandeModel({
+    this.id, this.nom, this.depart, this.destination, this.latitude, this.longitude, this.distanceValue, this.distanceText, this.details
   });
 
 }

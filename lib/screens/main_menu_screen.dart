@@ -1,3 +1,4 @@
+import 'package:depannagexpress/controllers/map_controller.dart';
 import 'package:depannagexpress/screens/map_screen.dart';
 import 'package:depannagexpress/screens/map_screen2.dart';
 import 'package:depannagexpress/utils/add_commande_form.dart';
@@ -16,6 +17,9 @@ class MainMenuPage extends StatefulWidget {
 }
 
 class _MainMenuPageState extends State<MainMenuPage> {
+
+  MapController mapController = Get.put(MapController());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -77,24 +81,26 @@ class _MainMenuPageState extends State<MainMenuPage> {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (builder) => const AddCommandeForm(),
-                            ),
-                          );
+                          // Remorquage simple
+                          mapController.typeRemorquage.value = 1;
+                          Get.to(() => MainMapScreen());
                         },
                         child: itemDashboard('Remorquage Simple', CupertinoIcons.car, Colors.deepOrange),
                       ),
 
                       GestureDetector(
                         onTap: () {
-                          Get.to(() => MapScreen2());
+                          // Remorquage avec Réparation
+                          mapController.typeRemorquage.value = 2;
+                          Get.to(() => MainMapScreen());
                         },
                         child : itemDashboard('Remorquage avec Reparation', CupertinoIcons.bus, Colors.green),
                       ),
 
                       GestureDetector(
                         onTap: () {
+                          // Réparation sur place
+                          mapController.typeRemorquage.value = 3;
                           Get.to(() => MainMapScreen());
                         },
                         child: itemDashboard('Reparation Sur Place', CupertinoIcons.money_dollar_circle, Colors.purple),

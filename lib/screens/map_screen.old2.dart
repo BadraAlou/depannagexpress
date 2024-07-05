@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:depannagexpress/assistants/requestAssistant.dart';
-import 'package:depannagexpress/controllers/map_controller.dart';
 import 'package:depannagexpress/models/address.dart';
 import 'package:depannagexpress/screens/search_screen.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +10,6 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 //import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:depannagexpress/widgets/Divider.dart';
 import 'package:depannagexpress/widgets/progressDialog.dart';
@@ -40,8 +38,6 @@ class MainMapScreen extends StatefulWidget {
 class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateMixin {
 
   // Users currentUser = Users();
-  MapController mapController = Get.put(MapController());
-
 
   Completer<GoogleMapController> _controllerGoogleMap = Completer();
   late GoogleMapController newGoogleMapController;
@@ -53,8 +49,7 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
   Set<Polyline> polylineSet = {};
 
   late Position currentPosition;
-  //late Position garagePosition;
-  final LatLng garagePosition = LatLng(12.6200175, -8.0035281);
+  late Position garagePosition;
   var geoLocator = Geolocator();
   double bottomPaddingOfMap = 0;
 
@@ -75,7 +70,7 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
 
   @override
   void initState() {
-
+    
     getCurrentUserInfo();
     //locatePosition();
     // getNewVersion();
@@ -200,17 +195,7 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
     String addressDropOff = await AssistantMethods.searchCoordinateAddressDropOff(LatLng(garagePosition.latitude, garagePosition.longitude), context);
     print("This is your destination address ==> " + addressDropOff);
 
-    if(mapController.typeRemorquage.value == 1) {
-      print('remorquage simple');
-
-    } else if(mapController.typeRemorquage.value == 2) {
-      displayRideDetailsContainer();
-    } else {
-      print('reparation sur place');
-      displayRideDetailsContainer();
-    }
-
-
+    displayRideDetailsContainer();
     //displayRequestRideContainer();
 
     // LatLng initialPosition = LatLng(position.latitude, position.longitude);
@@ -453,10 +438,8 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: 6.0,),
-                      Text("Garage: ${mapController.distanceMyPositionToGarageText.value}", style: TextStyle(fontSize: 16.0),),
-                      //Text("Garage Value: ${(mapController.distanceMyPositionToGarage.value)/1000}", style: TextStyle(fontSize: 16.0),),
-                      //Text("Ou allez vous?", style: TextStyle(fontSize: 20.0, fontFamily: "Brand Bold"),),
-                      //Text("Choisir une destination", style: TextStyle(fontSize: 14.0),),
+                      Text("Bonjour,", style: TextStyle(fontSize: 10.0),),
+                      Text("Ou allez vous?", style: TextStyle(fontSize: 20.0, fontFamily: "Brand Bold"),),
                       SizedBox(height: 20.0),
 
                       GestureDetector(
@@ -486,7 +469,7 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
                               children: [
                                 Icon(Icons.search, color: Colors.blueAccent,),
                                 SizedBox(width: 10.0,),
-                                Text("Chercher une destination")
+                                Text("Rechercher")
                               ],
                             ),
                           ),
@@ -576,27 +559,17 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
                           child: Row(
                             children: [
                               //Image.asset("images/taxi.png", height: 70.0, width: 80.0,),
-                              Image.asset("assets/depanneuse.png", height: 50.0, width: 80.0,),
+                              Image.asset("assets/depanneuse.png", height: 70.0, width: 80.0,),
                               SizedBox(width: 16.0,),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    //"Trajet", style: TextStyle(fontSize: 18.0, fontFamily: "Brand-Bold",),
-                                    "Trajet: ${(mapController.distanceMyPositionToGarage.value + mapController.currentDistanceValue.value) / 1000} km", style: TextStyle(fontSize: 18.0),
+                                    "Trajet", style: TextStyle(fontSize: 18.0, fontFamily: "Brand-Bold",),
                                   ),
                                   Text(
-                                    //((tripDirectionDetails != null) ? tripDirectionDetails.distanceText.toString() : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
-                                    ((tripDirectionDetails != null) ? 'Garage: ${mapController.distanceMyPositionToGarageText.value}' : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
+                                    ((tripDirectionDetails != null) ? tripDirectionDetails.distanceText.toString() : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
                                   ),
-                                  Text(
-                                    ((tripDirectionDetails != null) ? 'Destination: ${tripDirectionDetails.distanceText}' : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
-                                    //((tripDirectionDetails != null) ? 'Destination: ${(mapController.currentDistanceText.value ?? 0)} ==>' : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
-                                  ),
-                                  // Text(
-                                  //   //((tripDirectionDetails != null) ? tripDirectionDetails.distanceText.toString() : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
-                                  //   ((tripDirectionDetails != null) ? 'Total: ${((tripDirectionDetails.distanceValue ?? 0) + mapController.distanceMyPositionToGarage.value).toString()}' : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
-                                  // ),
                                 ],
                               ),
 
@@ -613,25 +586,24 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
 
                       SizedBox(height: 20.0,),
 
-                      // Padding(
-                      //   padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      //   child:
-                      //   Row(
-                      //     children: [
-                      //       Icon(FontAwesomeIcons.moneyCheck, size: 18.0, color: Colors.black54,),
-                      //       SizedBox(width: 16.0,),
-                      //       Text("Cash"),
-                      //       SizedBox(width: 6.0,),
-                      //       Icon(Icons.keyboard_arrow_down, color: Colors.black54, size: 16.0,),
-                      //     ],
-                      //   ),
-                      // ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Row(
+                          children: [
+                            Icon(FontAwesomeIcons.moneyCheck, size: 18.0, color: Colors.black54,),
+                            SizedBox(width: 16.0,),
+                            Text("Cash"),
+                            SizedBox(width: 6.0,),
+                            Icon(Icons.keyboard_arrow_down, color: Colors.black54, size: 16.0,),
+
+                          ],
+                        ),
+                      ),
 
                       SizedBox(height: 20.0,),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: ElevatedButton(
-
                           // RaisedButton(
                           onPressed: () {
                             displayRequestRideContainer();
@@ -642,8 +614,8 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text("Commander", style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.black),),
-                                Icon(FontAwesomeIcons.truck, color: Colors.black, size: 32.0,),
+                                Text("Commander", style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, color: Colors.white),),
+                                Icon(FontAwesomeIcons.biking, color: Colors.white, size: 18.0,),
                               ],
                             ),
                           ),
@@ -766,22 +738,6 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
     // print(details);
     setState(() {
       tripDirectionDetails = details;
-
-      if(mapController.isLocate.value == false ) {
-        // Distance garage ma position pas defini
-        mapController.isLocate.value = true;
-        mapController.currentDistanceText.value = tripDirectionDetails.distanceText ?? '';
-        mapController.distanceMyPositionToGarageText.value = tripDirectionDetails.distanceText ?? '';
-        mapController.currentDistanceValue.value = tripDirectionDetails.distanceValue ?? 0;
-        mapController.distanceMyPositionToGarage.value = tripDirectionDetails.distanceValue ?? 0;
-
-      } else {
-        // Distance garage ma position deja defini
-        mapController.currentDistanceText.value = tripDirectionDetails.distanceText ?? '';
-        mapController.currentDistanceValue.value = tripDirectionDetails.distanceValue ?? 0;
-      }
-
-
     });
 
     Navigator.pop(context);
