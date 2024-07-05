@@ -1,7 +1,9 @@
 import 'dart:math';
 
 
+import 'package:depannagexpress/controllers/map_controller.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:depannagexpress/assistants/requestAssistant.dart';
 import 'package:depannagexpress/data_handler/appData.dart';
@@ -16,6 +18,7 @@ class AssistantMethods {
     String placeAddress = "";
     String st1, st2, st3, st4;
     String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${mapKey}";
+    MapController mapController = Get.put(MapController());
 
     var response = await RequestAssistant.getRequest(url);
 
@@ -45,6 +48,8 @@ class AssistantMethods {
       userPickUpAddress.placeName = placeAddress;
 
       Provider.of<AppData>(context, listen: false).updatePickUpLocationAddress(userPickUpAddress);
+      mapController.globalPickUpAdresse.value = userPickUpAddress;
+
     }
 
     return placeAddress;
@@ -57,6 +62,8 @@ class AssistantMethods {
     String placeAddress = "";
     String st1, st2, st3, st4;
     String url = "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=${mapKey}";
+    MapController mapController = Get.put(MapController());
+
 
     var response = await RequestAssistant.getRequest(url);
 
@@ -86,6 +93,8 @@ class AssistantMethods {
       userDropOffAdresse.placeName = placeAddress;
 
       Provider.of<AppData>(context, listen: false).updateDropOffLocationAddress(userDropOffAdresse);
+      mapController.globalDropofAdresse.value = userDropOffAdresse;
+
     }
 
     return placeAddress;

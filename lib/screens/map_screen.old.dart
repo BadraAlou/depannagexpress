@@ -683,7 +683,6 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
     // print(details);
     setState(() {
       tripDirectionDetails = details;
-
     });
 
     Navigator.pop(context);

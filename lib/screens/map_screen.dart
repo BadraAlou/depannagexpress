@@ -186,7 +186,13 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
         return;
       }
     }
+
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => ProgressDialog(message: "Localisation encours, patientez svp ...",)
+    );
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    Navigator.pop(context);
     currentPosition = position;
     print('*** Yo position: $position');
 
@@ -578,15 +584,22 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
                           child: Row(
                             children: [
                               //Image.asset("images/taxi.png", height: 70.0, width: 80.0,),
-                              Image.asset("assets/depanneuse.png", height: 50.0, width: 80.0,),
-                              SizedBox(width: 16.0,),
+                              // Image.asset("assets/depanneuse.png", height: 50.0, width: 80.0,),
+                              // SizedBox(width: 16.0,),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    //"Trajet", style: TextStyle(fontSize: 18.0, fontFamily: "Brand-Bold",),
-                                    "Trajet: ${(mapController.distanceMyPositionToGarage.value + mapController.currentDistanceValue.value) / 1000} km", style: TextStyle(fontSize: 18.0),
-                                  ),
+
+                                Obx(() {
+                                  //if (reservationController.isSuccess.value) {
+                                    return Text(
+                                      //"Trajet", style: TextStyle(fontSize: 18.0, fontFamily: "Brand-Bold",),
+                                      "Trajet: ${(mapController.distanceMyPositionToGarage.value + mapController.currentDistanceValue.value) / 1000} km - ${mapController.currentAmount.value}  fcfa", style: TextStyle(fontSize: 18.0),
+                                    );
+                                 // }
+                                  return Container();
+                                  }),
+
                                   Text(
                                     //((tripDirectionDetails != null) ? tripDirectionDetails.distanceText.toString() : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
                                     ((tripDirectionDetails != null) ? 'Garage: ${mapController.distanceMyPositionToGarageText.value}' : '') , style: TextStyle(fontSize: 16.0, color: Colors.grey,),
@@ -636,8 +649,9 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
 
                           // RaisedButton(
                           onPressed: () {
-                            //displayRequestRideContainer();
+                            //
                             showAddDialog(context);
+                            displayRequestRideContainer();
                           },
                           // color: Theme.of(context).accentColor,
                           child: Padding(
@@ -778,10 +792,48 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
         mapController.currentDistanceValue.value = tripDirectionDetails.distanceValue ?? 0;
         mapController.distanceMyPositionToGarage.value = tripDirectionDetails.distanceValue ?? 0;
 
+        print('*** La distance en valeur: ${mapController.currentDistanceValue.value}');
+
+        if(mapController.distanceMyPositionToGarage.value >= 0 && mapController.distanceMyPositionToGarage.value < 6) {
+          mapController.currentAmount.value = 15000;
+        } else if (mapController.distanceMyPositionToGarage.value > 6  && mapController.distanceMyPositionToGarage.value < 11) {
+          mapController.currentAmount.value = 30000;
+        } else if (mapController.currentDistanceValue.value > 11  && mapController.currentDistanceValue.value < 15) {
+          mapController.currentAmount.value = 45000;
+        } else if (mapController.currentDistanceValue.value > 15  && mapController.currentDistanceValue.value < 20) {
+          mapController.currentAmount.value = 60000;
+        } else if (mapController.currentDistanceValue.value > 20  && mapController.currentDistanceValue.value < 30) {
+          mapController.currentAmount.value = 90000;
+        } else if (mapController.currentDistanceValue.value > 30  && mapController.currentDistanceValue.value < 40) {
+          mapController.currentAmount.value = 120000;
+        } else if (mapController.currentDistanceValue.value > 40  && mapController.currentDistanceValue.value < 50) {
+          mapController.currentAmount.value = 150000;
+        } else {
+          mapController.currentAmount.value = 15000;
+        }
+
       } else {
         // Distance garage ma position deja defini
         mapController.currentDistanceText.value = tripDirectionDetails.distanceText ?? '';
         mapController.currentDistanceValue.value = tripDirectionDetails.distanceValue ?? 0;
+
+        if(mapController.distanceMyPositionToGarage.value >= 0 && mapController.distanceMyPositionToGarage.value < 6) {
+          mapController.currentAmount.value = 15000;
+        } else if (mapController.distanceMyPositionToGarage.value > 6  && mapController.distanceMyPositionToGarage.value <= 10) {
+          mapController.currentAmount.value = 30000;
+        } else if (mapController.currentDistanceValue.value > 11  && mapController.currentDistanceValue.value <= 15) {
+          mapController.currentAmount.value = 45000;
+        } else if (mapController.currentDistanceValue.value > 15  && mapController.currentDistanceValue.value <= 20) {
+          mapController.currentAmount.value = 60000;
+        } else if (mapController.currentDistanceValue.value > 21  && mapController.currentDistanceValue.value <= 30) {
+          mapController.currentAmount.value = 90000;
+        } else if (mapController.currentDistanceValue.value > 31  && mapController.currentDistanceValue.value <= 40) {
+          mapController.currentAmount.value = 120000;
+        } else if (mapController.currentDistanceValue.value > 41  && mapController.currentDistanceValue.value <= 50) {
+          mapController.currentAmount.value = 150000;
+        } else {
+          mapController.currentAmount.value = 15000;
+        }
       }
 
 

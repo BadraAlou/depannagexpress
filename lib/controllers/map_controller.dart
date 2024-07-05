@@ -1,4 +1,5 @@
 
+import 'package:depannagexpress/models/address.dart';
 import 'package:depannagexpress/models/directionDetails.dart';
 import 'package:get/get.dart';
 
@@ -13,6 +14,8 @@ class MapController extends GetxController {
 
   //DirectionDetails tripDirectionDetails = DirectionDetails();
   Rx<DirectionDetails> globalTripDirectionDetails = Rx<DirectionDetails>(DirectionDetails());
-
+  Rx<Address> globalPickUpAdresse = Rx<Address>(Address());
+  Rx<Address> globalDropofAdresse = Rx<Address>(Address());
+  Rx<num> currentAmount = Rx<num>(0.0);
 
 }
