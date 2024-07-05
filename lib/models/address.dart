@@ -1,4 +1,5 @@
 class Address {
+
   String? placeFormattedAdress;
   String? placeName;
   String? placeId;

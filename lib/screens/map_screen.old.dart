@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:depannagexpress/controllers/map_controller.dart';
 import 'package:depannagexpress/screens/search_screen.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_geofire/flutter_geofire.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 //import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:depannagexpress/widgets/Divider.dart';
 import 'package:depannagexpress/widgets/progressDialog.dart';
@@ -664,6 +666,7 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
   }
 
   Future<void> getPlaceDirection() async {
+    MapController mapController = Get.put(MapController());
     var initialPos = Provider.of<AppData>(context, listen: false).pickUpLocation;
     var finalPos = Provider.of<AppData>(context, listen: false).dropOffLocation;
 
@@ -672,7 +675,7 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
 
     showDialog(
         context: context,
-        builder: (BuildContext context) => ProgressDialog(message: "Please wait ...",)
+        builder: (BuildContext context) => ProgressDialog(message: "Traitement encours, Patientez S'il vous plait ...",)
     );
 
     var details = await AssistantMethods.obtainPlaceDirectionDetails(pickUpLatLng, dropOffLatLng);
@@ -680,6 +683,7 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
     // print(details);
     setState(() {
       tripDirectionDetails = details;
+
     });
 
     Navigator.pop(context);

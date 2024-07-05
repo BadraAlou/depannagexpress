@@ -1,4 +1,5 @@
 
+import 'package:depannagexpress/models/directionDetails.dart';
 import 'package:get/get.dart';
 
 class MapController extends GetxController {
@@ -9,6 +10,9 @@ class MapController extends GetxController {
   Rx<String> currentDistanceText = Rx<String>('');
   //Rx<String> typeRemorquage = Rx<String>('');
   Rx<int> typeRemorquage = Rx<int>(0);
+
+  //DirectionDetails tripDirectionDetails = DirectionDetails();
+  Rx<DirectionDetails> globalTripDirectionDetails = Rx<DirectionDetails>(DirectionDetails());
 
 
 }

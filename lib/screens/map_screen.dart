@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:depannagexpress/assistants/requestAssistant.dart';
 import 'package:depannagexpress/controllers/map_controller.dart';
+import 'package:depannagexpress/forms/commande_form.dart';
 import 'package:depannagexpress/models/address.dart';
 import 'package:depannagexpress/screens/search_screen.dart';
+import 'package:depannagexpress/utils/add_commande_form.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_geofire/flutter_geofire.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -634,7 +636,8 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
 
                           // RaisedButton(
                           onPressed: () {
-                            displayRequestRideContainer();
+                            //displayRequestRideContainer();
+                            showAddDialog(context);
                           },
                           // color: Theme.of(context).accentColor,
                           child: Padding(
@@ -1058,6 +1061,27 @@ class _MainMapScreenState extends State<MainMapScreen> with TickerProviderStateM
   //     }
   //   }
   // }
+
+  void showAddDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return Container(
+          //height: 100,
+          child:  AlertDialog(
+            title: Text('Nouvelle Commande', textAlign: TextAlign.center,),
+            //content: AddDepenseForm(),
+            content: SizedBox(
+              width: double.maxFinite,
+              height: 350,
+              child: AddNewCommandeForm(),
+            ),
+
+          ),
+        );
+      },
+    );
+  }
 
 }
 
